@@ -2,28 +2,16 @@
 #include <SFML/Graphics.hpp>
 #include "WatorGame.hpp"
 #include "WatorGraphics.hpp"
+#include "TimeUtils.hpp"
 
-static constexpr size_t SIZE_X = 10, SIZE_Y = 10;
-static constexpr float TileWidth = 35.f;
+static constexpr size_t SIZE_X = 100, SIZE_Y = 60;
+static constexpr float TileWidth = 7.5f;
 
 static constexpr unsigned long long WINDOW_WIDTH = SIZE_X * TileWidth,
     WINDOW_HEIGHT = SIZE_Y * TileWidth;
 
 using GridType = Grid<SIZE_X, SIZE_Y>;
 using GraphicsType = Graphics<SIZE_X, SIZE_Y>;
-
-template<size_t SAMPLE_SIZE>
-class FpsCounter
-{
-    size_t frameNumber;
-    sf::Clock clock;
-
-public:
-    void operator()();
-
-    constexpr FpsCounter() : frameNumber(0), clock() { clock.restart(); }
-    ~FpsCounter() { std::cout << "\n"; }
-};
 
 static void processKeyPress(sf::RenderWindow& window, GraphicsType& graphics,
     GridType& grid, const sf::Event::KeyPressed* keyPressed)
@@ -76,7 +64,7 @@ int main()
     GridType grid;
     sf::Clock clock;
     sf::Time stepTime; // TODO: init and update when speed is changed
-    FpsCounter<256> fpsCount;
+    FpsCounter<0x20> fpsCount;
 
     sf::Time elapsed = sf::Time::Zero;
     while (window.isOpen())
@@ -97,19 +85,4 @@ int main()
 
         fpsCount();
     }
-}
-
-template <size_t SAMPLE_SIZE>
-void FpsCounter<SAMPLE_SIZE>::operator()()
-{
-    if (++frameNumber < SAMPLE_SIZE) return;
-
-    frameNumber = 0;
-    const float t = clock.restart().asSeconds() / SAMPLE_SIZE;
-    std::cout << "\rrender time: "
-        << t
-        << " sec, fps: "
-        << 1 / t
-        << "    ";
-    std::cout.flush();
 }
